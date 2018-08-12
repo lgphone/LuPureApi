@@ -4,8 +4,6 @@ from app.model.users import Users
 
 class Index(ApiHandler):
     def get(self):
-        import time
-        time.sleep(10)
         data = [
             {'id': _i.id,
              'username': _i.username,
@@ -22,4 +20,3 @@ class Index(ApiHandler):
         user = Users(username=self.input.username, password=self.input.password)
         self.db_session.add(user)
         self.db_session.commit()
-
