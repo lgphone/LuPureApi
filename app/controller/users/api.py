@@ -18,5 +18,5 @@ class Index(ApiHandler):
 
     def post(self):
         user = Users(username=self.input.username, password=self.input.password)
-        self.db_session.add(user)
-        self.db_session.commit()
+        self.db.session.add(user)
+        self.db.session.commit()

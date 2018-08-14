@@ -13,7 +13,7 @@ class ApiHandler(views.View, BaseHandler):
         self.set_cookie = {}
         self.delete_cookie = []
         self.request.user = None
-        self.db_session = db.session
+        self.db = db
 
         # 反射获取请求处理函数
         handler = getattr(self, self.request.method.lower(), None)
