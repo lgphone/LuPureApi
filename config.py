@@ -18,6 +18,8 @@ class DevConfig(BaseConfig):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///tmp.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     SQLALCHEMY_COMMIT_TEARDOWN = True
+    MONGO_URI = 'mongodb://127.0.0.1:27017/test'
+    ELASTICSEARCH_HOST = '127.0.0.1:9200'
 
 
 config = {
