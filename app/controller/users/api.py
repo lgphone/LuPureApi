@@ -1,4 +1,5 @@
 from sqlalchemy.exc import IntegrityError
+from app.core.dbhandler import db
 from app.core.apihandler import ApiHandler
 from app.core.basehandler import AuthError, LogicError
 from app.model.users import Users
@@ -22,8 +23,8 @@ class Index(ApiHandler):
 
     def post(self):
         user = Users(username=self.input.username, password=self.input.password)
-        self.db.session.add(user)
-        self.db.session.commit()
+        db.session.add(user)
+        db.session.commit()
 
 
 class Login(ApiHandler):
@@ -33,8 +34,6 @@ class Login(ApiHandler):
         if user_obj:
             user_info = self.to_dict(user_obj)
             user_info.pop('password')
-            # 设置session Header
-            self.set_header['X-Token-Id'] = self.session_id
             # 登陆tags
             self.session['is_login'] = True
             # 添加user信息，方便下次调用
@@ -61,8 +60,8 @@ class Register(ApiHandler):
         try:
             user_obj = Users(username=self.input.username, uid=self.generate_hash_uuid(12))
             user_obj.set_password(password=self.input.password)
-            self.db.session.add(user_obj)
-            self.db.session.commit()
+            db.session.add(user_obj)
+            db.session.commit()
         except IntegrityError:
             raise LogicError("用户名重复")
 
@@ -81,8 +80,8 @@ class Profile(ApiHandler):
             user_info['avatar_url'] = user_obj.email = self.input.avatar_url
 
         self.session['user'] = user_info
-        self.db.session.add(user_obj)
-        self.db.session.commit()
+        db.session.add(user_obj)
+        db.session.commit()
 
     @login_required()
     def get(self):

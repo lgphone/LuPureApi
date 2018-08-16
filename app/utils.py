@@ -1,6 +1,9 @@
 import functools
+import json
+from flask import request
 from .core.basehandler import LogicError, AuthError
-from flask import request, session
+from .core.dbhandler import redis_client
+from app.config import SESSION_KEY_PREFIX, SESSION_COOKIE_NAME, HEADER_TOKEN_NAME
 
 
 def login_required(*args):
@@ -10,12 +13,18 @@ def login_required(*args):
 
         @functools.wraps(func)
         def _func_wrapper(cls, *args, **kwargs):
-            session_id = request.cookies.get('session') or request.headers.get('X-Token-Id') or None
 
-            if not session_id or not session.get('is_login'):
+            t_id = request.cookies.get(SESSION_COOKIE_NAME) or request.headers.get(HEADER_TOKEN_NAME) or None
+            if not t_id:
                 raise AuthError('无效的认证')
 
-            if not role or role in session.get('roles'):
+            session_data = json.loads(redis_client.get(SESSION_KEY_PREFIX + t_id)) \
+                if redis_client.get(SESSION_KEY_PREFIX + t_id) else None
+
+            if not session_data or not session_data.get('is_login'):
+                raise AuthError('无效的认证')
+
+            if not role or role in session_data.get('roles'):
                 return func(cls, *args, **kwargs)
             else:
                 raise AuthError('没有权限')

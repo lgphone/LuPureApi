@@ -79,7 +79,7 @@ class BaseHandler(object):
             data.pop('id')
         for k, v in data.items():
             if isinstance(v, datetime.datetime):
-                data[k] = cls.strptime(v)
+                data[k] = cls.time_create(v)
 
         return data
 

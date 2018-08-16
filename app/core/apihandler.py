@@ -1,6 +1,6 @@
 from flask import views, request, jsonify, make_response, session
 from .basehandler import BaseHandler, AuthError, LogicError, ParamsError, Dict
-from .dbhandler import db, es_client, mongo_client
+from app.config import SESSION_COOKIE_NAME, HEADER_TOKEN_NAME
 
 
 class ApiHandler(views.View, BaseHandler):
@@ -10,15 +10,10 @@ class ApiHandler(views.View, BaseHandler):
     def dispatch_request(self, *args, **kwargs):
         self.query_or_body = None
         self.request = request
+        self.session = session
         self.set_header = {}
         self.set_cookie = {}
         self.delete_cookie = []
-        self.request.user = None
-        self.db = db
-        self.es_client = es_client
-        self.mongo_client = mongo_client
-        self.session = session
-        self.session_id = self.request.cookies.get('session', None)
 
         # 反射获取请求处理函数
         handler = getattr(self, self.request.method.lower(), None)
@@ -59,13 +54,15 @@ class ApiHandler(views.View, BaseHandler):
 
         response = make_response(jsonify(res))
 
+        # 设置Header
+        self.check_header_token()
+
         if self.set_header:
-            for k, v in self.set_cookie.items():
+            for k, v in self.set_header.items():
                 response.headers[k] = v
 
         if self.set_cookie:
             for k, v in self.set_cookie.items():
-                print(k, v)
                 response.set_cookie(k, v)
 
         if self.delete_cookie:
@@ -88,3 +85,7 @@ class ApiHandler(views.View, BaseHandler):
         if self.query_or_body is None:
             self.query_or_body = self.all_query
         return self.query_or_body
+
+    def check_header_token(self):
+        if not request.headers.get(HEADER_TOKEN_NAME):
+            self.set_header.update({HEADER_TOKEN_NAME: request.cookies.get(SESSION_COOKIE_NAME)})
