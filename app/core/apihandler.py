@@ -10,6 +10,7 @@ class ApiHandler(views.View, BaseHandler):
     def dispatch_request(self, *args, **kwargs):
         self.query_or_body = None
         self.request = request
+        self.set_header = {}
         self.set_cookie = {}
         self.delete_cookie = []
         self.request.user = None
@@ -58,9 +59,9 @@ class ApiHandler(views.View, BaseHandler):
 
         response = make_response(jsonify(res))
 
-        # 设置session Header 用于不能用cookie 的应用
-        if self.session_id:
-            response.headers['X-Token-Id'] = self.session_id
+        if self.set_header:
+            for k, v in self.set_cookie.items():
+                response.headers[k] = v
 
         if self.set_cookie:
             for k, v in self.set_cookie.items():

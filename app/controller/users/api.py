@@ -29,17 +29,26 @@ class Index(ApiHandler):
 class Login(ApiHandler):
     @need_params(*['username', 'password'])
     def post(self):
-        user_info = check_login(username=self.input.username, password=self.input.password)
-        if user_info:
+        user_obj = check_login(username=self.input.username, password=self.input.password)
+        if user_obj:
+            user_info = self.to_dict(user_obj)
+            user_info.pop('password')
+            # 设置session Header
+            self.set_header['X-Token-Id'] = self.session_id
+            # 登陆tags
+            self.session['is_login'] = True
+            # 添加user信息，方便下次调用
+            self.session['user'] = user_info
+            # 返回用户信息
             return user_info
         else:
-            raise AuthError('账号密码不正确')
+            raise AuthError('账号或密码不正确')
 
 
 class LoginOut(ApiHandler):
     @login_required()
     def get(self):
-        return self.post
+        self.session.clear()
 
     @login_required()
     def post(self):
@@ -61,21 +70,21 @@ class Register(ApiHandler):
 class Profile(ApiHandler):
     @login_required()
     def post(self):
-        user_obj = self.session.get('user')
+        user_info = self.session.get('user')
+        user_obj = Users.query.filter_by(uid=user_info['uid']).first()
+
         if self.input.email:
-            user_obj.email = self.input.email
+            user_info['email'] = user_obj.email = self.input.email
         if self.input.sex:
-            user_obj.sex = self.input.sex
+            user_info['sex'] = user_obj.email = self.input.sex
         if self.input.avatar_url:
-            user_obj.avatar_url = self.input.avatar_url
+            user_info['avatar_url'] = user_obj.email = self.input.avatar_url
+
+        self.session['user'] = user_info
         self.db.session.add(user_obj)
         self.db.session.commit()
-        self.session['user'] = user_obj
 
     @login_required()
     def get(self):
-        user_obj = self.session.get('user')
-        data = self.to_dict(user_obj)
-        data.pop('password')
-
-        return data
+        user_info = self.session.get('user')
+        return user_info
