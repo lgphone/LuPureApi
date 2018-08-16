@@ -28,7 +28,7 @@ class ApiHandler(views.View, BaseHandler):
             if self.request.method == 'HEAD':
                 return make_response('', 200)
             # 405
-            return make_response('405 METHOD %r NOT ALLOWED' % self.request.method, 405)
+            return make_response('<h1>METHOD {0} NOT ALLOWED</h1>'.format(self.request.method), 405)
 
         return self.api_wrapper(handler, *args, **kwargs)
 

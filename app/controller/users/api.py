@@ -35,9 +35,6 @@ class Login(ApiHandler):
         else:
             raise AuthError('账号密码不正确')
 
-    def get(self):
-        return self.post
-
 
 class LoginOut(ApiHandler):
     @login_required()
