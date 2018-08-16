@@ -1,6 +1,6 @@
-from flask import views, request, jsonify, make_response
+from flask import views, request, jsonify, make_response, session
 from .basehandler import BaseHandler, AuthError, LogicError, ParamsError, Dict
-from .dbhandler import db
+from .dbhandler import db, es_client, mongo_client
 
 
 class ApiHandler(views.View, BaseHandler):
@@ -14,6 +14,10 @@ class ApiHandler(views.View, BaseHandler):
         self.delete_cookie = []
         self.request.user = None
         self.db = db
+        self.es_client = es_client
+        self.mongo_client = mongo_client
+        self.session = session
+        self.session_id = self.request.cookies.get('session', None)
 
         # 反射获取请求处理函数
         handler = getattr(self, self.request.method.lower(), None)
@@ -46,16 +50,22 @@ class ApiHandler(views.View, BaseHandler):
         except ParamsError as e:
             code = e.code
             msg = str(e)
-
         cost_time = self.get_timestamp() - start_time
 
-        res = {'code': code, 'msg': msg, 'data': data, 'cost': "{0}ms".format(round(cost_time * 1000, 2))}
+        res = {'code': code, 'data': data, 'cost': "{0}ms".format(round(cost_time * 1000, 2))}
+        if msg:
+            res.update({'msg': msg})
 
         response = make_response(jsonify(res))
 
+        # 设置session Header 用于不能用cookie 的应用
+        if self.session_id:
+            response.headers['X-Token-Id'] = self.session_id
+
         if self.set_cookie:
             for k, v in self.set_cookie.items():
-                response.set_cookie(k, v, expires=None)
+                print(k, v)
+                response.set_cookie(k, v)
 
         if self.delete_cookie:
             for k in self.delete_cookie:

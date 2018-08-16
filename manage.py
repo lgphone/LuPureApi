@@ -1,14 +1,11 @@
-import os
 from flask_script import Manager
+from flask_migrate import Migrate, MigrateCommand
 from gevent.pywsgi import WSGIServer
-from config import config
-from app import create_app
+from app import app as main_app
 from app.core.dbhandler import db
 
-run_env = os.getenv('FLASK_CONFIG') or 'dev'
-app = create_app(config[run_env])
-
-manager = Manager(app)
+manager = Manager(main_app)
+migrate = Migrate(main_app, db)
 
 
 @manager.command
@@ -17,17 +14,24 @@ def hello():
 
 
 @manager.command
-def migrate():
+def create_all():
     print('starting migrate db...')
-    db.create_all(app=app)
+    db.create_all(app=main_app)
     print('migrate db over')
 
 
 @manager.command
+def drop_all():
+    db.drop_all()
+
+
+@manager.command
 def run_prod():
-    app = create_app(config[run_env])
-    app = WSGIServer(('0.0.0.0', 5000), app)
+    app = WSGIServer(('0.0.0.0', 5000), main_app)
     app.serve_forever()
+
+
+manager.add_command('db', MigrateCommand)
 
 
 if __name__ == "__main__":

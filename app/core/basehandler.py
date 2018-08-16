@@ -4,6 +4,7 @@ import uuid
 import json
 import hashlib
 import base64
+import copy
 
 
 class BaseHandler(object):
@@ -66,6 +67,21 @@ class BaseHandler(object):
     @classmethod
     def timedelta(cls, **kwargs):
         return datetime.timedelta(**kwargs)
+
+    @classmethod
+    def to_dict(cls, obj):
+        data = copy.deepcopy(obj.__dict__)
+        if data.get('_sa_instance_state'):
+            data.pop('_sa_instance_state')
+        if data.get('available'):
+            data.pop('available')
+        if data.get('id'):
+            data.pop('id')
+        for k, v in data.items():
+            if isinstance(v, datetime.datetime):
+                data[k] = cls.strptime(v)
+
+        return data
 
 
 class BaseError(Exception):
