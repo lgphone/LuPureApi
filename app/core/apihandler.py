@@ -54,8 +54,8 @@ class ApiHandler(views.View, BaseHandler):
 
         response = make_response(jsonify(res))
 
-        # 设置Header
-        self.check_header_token()
+        # 隐藏 服务器信息
+        response.headers['Server'] = 'Tengine'
 
         if self.set_header:
             for k, v in self.set_header.items():
@@ -86,6 +86,3 @@ class ApiHandler(views.View, BaseHandler):
             self.query_or_body = self.all_query
         return self.query_or_body
 
-    def check_header_token(self):
-        if not request.headers.get(HEADER_TOKEN_NAME):
-            self.set_header.update({HEADER_TOKEN_NAME: request.cookies.get(SESSION_COOKIE_NAME)})

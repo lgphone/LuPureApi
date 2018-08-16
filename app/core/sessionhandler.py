@@ -83,4 +83,5 @@ class LuSessionInterface(SessionInterface):
                             expires=expires, httponly=httponly,
                             domain=domain, path=path, secure=secure)
         # 设置header
-        response.headers[HEADER_TOKEN_NAME] = session.sid
+        if not response.headers.get(HEADER_TOKEN_NAME):
+            response.headers[HEADER_TOKEN_NAME] = session.sid
