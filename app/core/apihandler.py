@@ -1,6 +1,5 @@
 from flask import views, request, jsonify, make_response, session
 from .basehandler import BaseHandler, AuthError, LogicError, ParamsError, Dict
-from app.config import SESSION_COOKIE_NAME, HEADER_TOKEN_NAME
 
 
 class ApiHandler(views.View, BaseHandler):
