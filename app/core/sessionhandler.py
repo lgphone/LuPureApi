@@ -33,9 +33,7 @@ class LuSessionInterface(SessionInterface):
         return str(uuid.uuid4())
 
     def open_session(self, app, request):
-        """
-        程序刚启动时执行，需要返回一个session对象
-        """
+        
         # 从cookie 或者header 中获取sid
         sid = request.cookies.get(app.session_cookie_name) or request.headers.get(HEADER_TOKEN_NAME)
         if not sid:
@@ -58,12 +56,7 @@ class LuSessionInterface(SessionInterface):
         return self.session_class(sid=sid)
 
     def save_session(self, app, session, response):
-        """
-        程序结束前执行，可以保存session中所有的值
-        如：
-            保存到resit
-            写入到用户cookie
-        """
+        
         domain = self.get_cookie_domain(app)
         path = self.get_cookie_path(app)
         httponly = self.get_cookie_httponly(app)
