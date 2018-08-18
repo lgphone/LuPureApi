@@ -4,6 +4,9 @@ from app.core.dbhandler import db
 
 
 class Users(db.Model):
+    """
+    用户表
+    """
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)

@@ -26,10 +26,10 @@ class BaseConfig(object):
 class DevConfig(BaseConfig):
     DEBUG = True
     # SECRET_KEY = os.environ.get('SECRET_KEY') or 'ssdi12$ldsf1'
-    # SQLALCHEMY_DATABASE_URI = 'sqlite:///' + SQLITE_PATH
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + SQLITE_PATH
     SESSION_COOKIE_NAME = SESSION_COOKIE_NAME
     REMEMBER_COOKIE_DURATION = timedelta(days=3)
-    SQLALCHEMY_DATABASE_URI = 'mysql://flask:123456@192.168.1.30:3306/flask?charset=utf8mb4'
+
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     SQLALCHEMY_COMMIT_TEARDOWN = True
     SQLALCHEMY_POOL_SIZE = 10

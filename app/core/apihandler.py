@@ -1,5 +1,5 @@
 from flask import views, request, jsonify, make_response, session
-from .basehandler import BaseHandler, AuthError, LogicError, ParamsError, Dict
+from .basehandler import BaseHandler, AuthError, LogicError, ParamsError, Dict, VerifyError
 
 
 class ApiHandler(views.View, BaseHandler):
@@ -14,10 +14,8 @@ class ApiHandler(views.View, BaseHandler):
         self.set_cookie = {}
         self.delete_cookie = []
 
-        # 反射获取请求处理函数
         handler = getattr(self, self.request.method.lower(), None)
 
-        # 没有对应逻辑，返回405
         if not callable(handler):
             # head 处理方式
             if self.request.method == 'HEAD':
@@ -45,6 +43,10 @@ class ApiHandler(views.View, BaseHandler):
         except ParamsError as e:
             code = e.code
             msg = str(e)
+        except VerifyError as e:
+            code = e.code
+            msg = str(e)
+
         cost_time = self.get_timestamp() - start_time
 
         res = {'code': code, 'data': data, 'cost': "{0}ms".format(round(cost_time * 1000, 2))}

@@ -1,7 +1,8 @@
-from app.controller.users.api import Login, Register, LoginOut, Profile
+from app.controller.users.api import Login, Register, LoginOut, Profile, Captcha
 
 
 routers = [
+    ('/users/_captcha', Captcha, 'users_captcha'),
     ('/users/login', Login, 'users_login'),
     ('/users/register', Register, 'users_register'),
     ('/users/logout', LoginOut, 'users_logout'),
