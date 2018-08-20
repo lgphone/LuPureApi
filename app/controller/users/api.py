@@ -6,7 +6,7 @@ from app.core.basehandler import AuthError, LogicError, VerifyError
 from app.model.users import Users
 from app.utils import need_params, login_required, generate_check_code
 from .wrapper import check_login, get_roles
-
+from app.schedule import test
 
 class Index(ApiHandler):
     def get(self):
@@ -114,3 +114,11 @@ class Captcha(ApiHandler):
 
         # 设置session为验证通过，这样比如收集验证码就可以根据此字段判断用户是否已经输入验证码并正确的
         self.session['code_pass'] = True
+
+
+class Test(ApiHandler):
+    def get(self):
+        print('test')
+        test.delay('yang')
+
+

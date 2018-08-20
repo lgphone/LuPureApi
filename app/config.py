@@ -10,6 +10,7 @@ REDIS_PORT = 6379
 REDIS_DB = 0
 HEADER_TOKEN_NAME = 'X-Token'
 SESSION_COOKIE_NAME = 'token'
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/1'
 
 
 class BaseConfig(object):
