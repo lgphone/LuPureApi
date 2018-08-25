@@ -8,6 +8,7 @@ from app.utils import need_params, login_required, generate_check_code
 from .wrapper import check_login, get_roles
 from app.schedule import test
 
+
 class Index(ApiHandler):
     def get(self):
         data = [
