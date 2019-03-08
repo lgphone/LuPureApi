@@ -105,3 +105,6 @@ venv.bak/
 .mypy_cache/
 
 app/tmp.db
+
+# 数据库迁移相关
+migrations/
